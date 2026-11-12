@@ -1,0 +1,32 @@
+name: ClickWheel APK
+
+on:
+  push:
+    paths:
+      - "clickwheel/**"
+      - ".github/workflows/clickwheel-android.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: clickwheel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build APKs
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug assembleRelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clickwheel-apk
+          path: |
+            clickwheel/app/build/outputs/apk/release/*.apk
+            clickwheel/app/build/outputs/apk/debug/*.apk
